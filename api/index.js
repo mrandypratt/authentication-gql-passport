@@ -56,7 +56,7 @@ app.use(passport.session());  // Authenticates the session
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req, res }) => buildContext({ req, res }),
+  context: ({ req, res }) => buildContext({ req, res, User }),
 });
 
 server.start().then(() => server.applyMiddleware({app}));
