@@ -15,7 +15,7 @@ const users = [
   }
 ];
 
-export const Users = {
+export const User = {
   getUsers: () => users,
   addUser: (user) => users.push(user),
 };

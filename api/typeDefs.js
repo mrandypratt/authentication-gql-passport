@@ -13,6 +13,12 @@ const typeDefs = gql`
   type Mutation {
     logout: Boolean
   }
+  type AuthPayload {
+    user: User
+  }
+  type Mutation {
+    login(email: String!, password: String!): AuthPayload
+  }
 `;
 
 export default typeDefs;

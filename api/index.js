@@ -2,13 +2,24 @@ import express from 'express';
 import session from 'express-session';
 import { v4 as uuidv4 } from 'uuid';
 import passport from 'passport';
-import User from './User';
+import { GraphQLLocalStrategy, buildContext } from 'graphql-passport';
+import { User } from './User';
 import { ApolloServer } from 'apollo-server-express';
 import typeDefs from './typeDefs';
 import resolvers from './resolvers';
 
 const PORT = 4000;
 const SESSION_SECRECT = 'bad secret';
+
+// Validates User/Password
+passport.use(
+  new GraphQLLocalStrategy((email, password, done) => {
+    const users = User.getUsers();
+    const matchingUser = users.find(user => email === user.email && password === user.password);
+    const error = matchingUser ? null : new Error('no matching user');
+    done(error, matchingUser);
+  }),
+);
 
 // Save user's ID to the session
 passport.serializeUser((user, done) => {
@@ -45,10 +56,7 @@ app.use(passport.session());  // Authenticates the session
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req }) => ({
-    getUser: () => req.user,
-    logout: () => req.logout(),
-  }),
+  context: ({ req, res }) => buildContext({ req, res }),
 });
 
 server.start().then(() => server.applyMiddleware({app}));
